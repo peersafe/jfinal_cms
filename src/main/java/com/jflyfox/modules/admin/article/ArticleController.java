@@ -268,9 +268,7 @@ public class ArticleController extends BaseProjectController {
 			sql.whereLike("title", model.getStr("title"));
 			sql.whereEquals("folder_id", model.getInt("folder_id"));
 			sql.whereEquals("status", model.getInt("status"));
-
-			// 站点设置
-			sql.whereEquals("site_id", getSessionSite().getBackSiteId());
+			
 		}
 
 		// 排序
