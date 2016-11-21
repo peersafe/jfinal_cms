@@ -262,6 +262,8 @@ public class ArticleController extends BaseProjectController {
 				+ " where approve_status in ( " //
 				+ ArticleConstant.APPROVE_STATUS_INIT + "," + ArticleConstant.APPROVE_STATUS_UPDATE + " ) ");
 		if (model.getAttrValues().length != 0) {
+			// 站点设置
+			sql.whereEquals("site_id", getSessionSite().getBackSiteId());
 			sql.setAlias("t");
 			sql.whereLike("title", model.getStr("title"));
 			sql.whereEquals("folder_id", model.getInt("folder_id"));
