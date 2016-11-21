@@ -7,10 +7,16 @@ import com.jflyfox.api.constant.ApiConstant;
 import com.jflyfox.api.form.ApiResp;
 import com.jflyfox.api.service.IApiLogic;
 import com.jflyfox.api.service.impl.ApiV100Logic;
+import com.jflyfox.util.Config;
 
 public class ApiUtils {
 
 	private static final Map<String, IApiLogic> map = new HashMap<String, IApiLogic>();
+	
+	/**
+	 * API是否返回JSONP格式数据
+	 */
+	public static final boolean API_RETURNJSONP = Config.getToBoolean("CMS.API_RETURNJSONP");
 	/**
 	 * 调试日志
 	 */

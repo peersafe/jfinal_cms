@@ -1,5 +1,8 @@
 package com.jflyfox.api.controller;
 
+import java.io.IOException;
+
+import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.JsonKit;
 import com.jflyfox.api.form.ApiResp;
@@ -8,7 +11,11 @@ import com.jflyfox.api.interceptor.ApiInterceptor;
 import com.jflyfox.api.service.ApiService;
 import com.jflyfox.api.util.ApiUtils;
 import com.jflyfox.component.base.BaseProjectController;
+import com.jflyfox.component.util.ArticleCountCache;
+import com.jflyfox.component.util.JFlyFoxUtils;
 import com.jflyfox.jfinal.component.annotation.ControllerBind;
+import com.jflyfox.modules.admin.article.TbArticle;
+import com.jflyfox.modules.front.service.FrontCacheService;
 import com.jflyfox.util.StrUtils;
 
 @ControllerBind(controllerKey = "/api")
@@ -42,6 +49,7 @@ public class ApiController extends BaseProjectController {
 	 * 2016年10月3日 下午1:38:27 flyfox 369191470@qq.com
 	 */
 	public void action() {
+
 		long start = System.currentTimeMillis();
 
 		BaseApiForm from = getForm();
@@ -61,9 +69,45 @@ public class ApiController extends BaseProjectController {
 					+ "\n[resp=" + JsonKit.toJson(resp) + "]" //
 					+ "\n[time=" + (System.currentTimeMillis() - start) + "ms]");
 		}
-		renderJson(resp);
-	}
+		
+		if(ApiUtils.API_RETURNJSONP){
+			writeJson(resp);
+		}else{
+			renderJson(resp);
+		}
+		
 
+	}
+	/*@Before(ApiInterceptor.class)
+	public TbArticle addArticleCount(TbArticle article) {
+		if (article != null) {
+			// 更新浏览量
+			 * String key = getSessionAttr(JFlyFoxUtils.USER_KEY);
+			if (key != null) {
+				ArticleCountCache.addCountView(article, key);
+				// 缓存访问量和评论数
+				new FrontCacheService().addArticleCount(article);
+			}
+			
+		}
+		return article;
+	}
+*/
+	public  void writeJson(Object object) {
+		try {
+			String callback = getRequest().getParameter("callback");
+
+			String json = JSON.toJSONStringWithDateFormat(object, "yyyy-MM-dd HH:mm:ss");
+			//System.out.println(json+"   ==json");
+			getResponse().setContentType("text/html;charset=utf-8");
+			getResponse().getWriter().write(callback+"(" + json + ")");
+			getResponse().getWriter().flush();
+			getResponse().getWriter().close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public BaseApiForm getForm() {
 		BaseApiForm form = getBean(BaseApiForm.class, null);
 		return form;
